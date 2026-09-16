@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ShortZone</title>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -10,429 +10,336 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,sans-serif;
+}
+
 body{
   background:#000;
-  color:#fff;
-  font-family:Arial,sans-serif;
-  overflow:hidden;
+  color:white;
 }
-button{border:0;cursor:pointer}
 
+.page{
+  min-height:100vh;
+  display:none;
+}
+
+.active{
+  display:block;
+}
+
+/* LOGIN */
 #loginPage{
-  height:100vh;
+  min-height:100vh;
+  background:linear-gradient(160deg,#071dff,#00aaff);
   display:flex;
   align-items:center;
   justify-content:center;
-  background:linear-gradient(135deg,#075cff,#00bfff);
   padding:20px;
 }
-.loginBox{
+
+.login-box{
   width:100%;
-  max-width:380px;
-  padding:30px 22px;
+  max-width:400px;
+  background:rgba(0,0,0,.85);
   border-radius:25px;
-  text-align:center;
-  background:rgba(0,0,0,.35);
-  backdrop-filter:blur(15px);
+  padding:30px 22px;
+  box-shadow:0 10px 40px rgba(0,0,0,.4);
 }
+
 .logo{
-  font-size:40px;
+  text-align:center;
+  font-size:36px;
   font-weight:900;
   margin-bottom:8px;
 }
-.logo span{color:#19a7ff}
-.sub{color:#ddd;margin-bottom:28px}
 
-.googleBtn{
+.subtitle{
+  text-align:center;
+  color:#bbb;
+  margin-bottom:25px;
+}
+
+input{
   width:100%;
   padding:15px;
-  border-radius:14px;
-  background:#fff;
-  color:#222;
-  font-weight:bold;
+  margin:7px 0;
+  border:0;
+  outline:none;
+  border-radius:13px;
+  background:#222;
+  color:white;
   font-size:16px;
 }
-#error{
-  color:#ff7777;
-  margin-top:15px;
-  font-size:13px;
-}
 
-#mainPage{
-  display:none;
-  height:100vh;
-  position:relative;
-}
-
-#feed{
-  height:calc(100vh - 65px);
-  overflow-y:auto;
-  scroll-snap-type:y mandatory;
-  scrollbar-width:none;
-}
-#feed::-webkit-scrollbar{display:none}
-
-.videoItem{
-  height:calc(100vh - 65px);
-  position:relative;
-  scroll-snap-align:start;
-  background:#111;
-}
-.videoItem video{
+button{
   width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
-.videoInfo{
-  position:absolute;
-  left:15px;
-  right:90px;
-  bottom:25px;
-  z-index:3;
-  text-shadow:0 2px 5px #000;
-}
-.username{
-  font-size:17px;
+  padding:15px;
+  margin-top:10px;
+  border:0;
+  border-radius:13px;
+  background:#1683ff;
+  color:white;
+  font-size:16px;
   font-weight:bold;
-  margin-bottom:8px;
-}
-.caption{font-size:14px}
-
-.verified{
-  display:inline-flex;
-  width:18px;
-  height:18px;
-  align-items:center;
-  justify-content:center;
-  border-radius:50%;
-  background:#168cff;
-  font-size:11px;
-  margin-left:4px;
 }
 
-.actions{
-  position:absolute;
-  right:12px;
-  bottom:25px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:18px;
-  z-index:5;
+button:active{
+  transform:scale(.98);
 }
-.actionBtn{
-  background:none;
-  color:#fff;
-  font-size:29px;
-  text-shadow:0 2px 5px #000;
-}
-.actionCount{
-  font-size:12px;
-  margin-top:-14px;
-}
-.liked{color:#ff285c}
 
-.bottomNav{
-  position:absolute;
-  bottom:0;
-  left:0;
-  width:100%;
-  height:65px;
-  display:flex;
-  justify-content:space-around;
-  align-items:center;
-  background:rgba(0,0,0,.95);
-  border-top:1px solid #222;
-  z-index:20;
-}
-.navBtn{
-  background:none;
+.switch{
+  text-align:center;
+  margin-top:18px;
   color:#aaa;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:3px;
 }
-.navBtn b{font-size:23px}
-.navBtn.active{color:#fff}
 
-#uploadPage,#profilePage{
-  display:none;
-  position:absolute;
-  inset:0;
-  z-index:30;
+.switch span{
+  color:#3ca9ff;
+  font-weight:bold;
+}
+
+.error{
+  color:#ff5252;
+  text-align:center;
+  margin-top:12px;
+  min-height:20px;
+}
+
+/* HOME */
+#homePage{
+  min-height:100vh;
   background:#050505;
-  overflow-y:auto;
   padding-bottom:80px;
 }
-.pageHeader{
+
+.topbar{
   height:60px;
   display:flex;
   align-items:center;
-  padding:0 18px;
-  font-size:19px;
-  font-weight:bold;
+  justify-content:space-between;
+  padding:0 16px;
+  background:#080808;
   border-bottom:1px solid #222;
-}
-.uploadBox{padding:22px}
-.input{
-  width:100%;
-  padding:15px;
-  margin-bottom:15px;
-  border-radius:14px;
-  border:1px solid #333;
-  background:#151515;
-  color:#fff;
-}
-.uploadBtn{
-  width:100%;
-  padding:15px;
-  border-radius:14px;
-  background:#168cff;
-  color:#fff;
-  font-size:16px;
-  font-weight:bold;
-}
-.status{
-  text-align:center;
-  color:#aaa;
-  margin-top:15px;
+  position:sticky;
+  top:0;
+  z-index:10;
 }
 
-.profileTop{
-  text-align:center;
-  padding:30px 20px;
+.brand{
+  font-size:25px;
+  font-weight:900;
 }
+
+.logout{
+  width:auto;
+  padding:9px 14px;
+  margin:0;
+  background:#222;
+  font-size:13px;
+}
+
+.feed{
+  max-width:600px;
+  margin:auto;
+}
+
+.video-card{
+  min-height:620px;
+  border-bottom:1px solid #222;
+  position:relative;
+  background:#111;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.video-card video{
+  width:100%;
+  max-height:760px;
+  object-fit:cover;
+}
+
+.video-info{
+  position:absolute;
+  bottom:20px;
+  left:15px;
+  right:15px;
+  background:linear-gradient(transparent,rgba(0,0,0,.85));
+  padding-top:80px;
+}
+
+.username{
+  font-weight:bold;
+  font-size:17px;
+}
+
+.verified{
+  color:#1683ff;
+  font-size:17px;
+}
+
+.empty{
+  text-align:center;
+  padding:80px 20px;
+  color:#888;
+}
+
+.bottom{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  height:65px;
+  background:#090909;
+  border-top:1px solid #222;
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+  z-index:20;
+}
+
+.nav{
+  background:none;
+  width:auto;
+  margin:0;
+  padding:8px 20px;
+  font-size:13px;
+}
+
+.nav.active-nav{
+  color:#1683ff;
+}
+
+.profile{
+  max-width:600px;
+  margin:auto;
+  padding:35px 20px;
+  text-align:center;
+}
+
 .avatar{
   width:90px;
   height:90px;
   border-radius:50%;
-  object-fit:cover;
-  border:3px solid #168cff;
-}
-.profileName{
-  font-size:21px;
+  background:#1683ff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:35px;
   font-weight:bold;
-  margin-top:12px;
+  margin:auto auto 15px;
 }
+
 .stats{
   display:flex;
   justify-content:center;
   gap:35px;
-  margin-top:22px;
-}
-.stat{text-align:center}
-.stat b{display:block;font-size:19px}
-.stat span{font-size:12px;color:#999}
-.logoutBtn{
   margin-top:25px;
-  padding:12px 25px;
-  border-radius:12px;
-  background:#222;
-  color:#fff;
 }
 
-#commentModal{
-  display:none;
-  position:fixed;
-  inset:0;
-  z-index:100;
-  background:rgba(0,0,0,.65);
-  align-items:flex-end;
+.stat b{
+  display:block;
+  font-size:20px;
 }
-.commentBox{
-  width:100%;
-  max-height:75vh;
-  background:#111;
-  border-radius:22px 22px 0 0;
-  padding:18px;
-}
-.commentHeader{
-  display:flex;
-  justify-content:space-between;
-  margin-bottom:15px;
-  font-weight:bold;
-}
-.commentHeader button{
-  background:none;
-  color:#fff;
-  font-size:18px;
-}
-#commentsList{
-  max-height:50vh;
-  overflow-y:auto;
-}
-.comment{
-  padding:10px 0;
-  border-bottom:1px solid #222;
-  font-size:14px;
-}
-.commentInputRow{
-  display:flex;
-  gap:8px;
-  margin-top:12px;
-}
-#commentInput{
-  flex:1;
-  padding:12px;
-  border:0;
-  outline:none;
-  border-radius:12px;
-  background:#222;
-  color:#fff;
-}
-.sendComment{
-  padding:0 15px;
-  border-radius:12px;
-  background:#168cff;
-  color:#fff;
-}
-.empty{
-  text-align:center;
-  color:#777;
-  padding:50px 20px;
+
+.stat small{
+  color:#888;
 }
 </style>
 </head>
 
 <body>
 
-<div id="loginPage">
-  <div class="loginBox">
-    <div class="logo">Short<span>Zone</span></div>
-    <div class="sub">Video pendek untuk semua orang</div>
+<!-- LOGIN -->
+<div id="loginPage" class="page active">
+  <div class="login-box">
 
-    <button class="googleBtn" onclick="loginGoogle()">
-      🔵 Masuk dengan Google
-    </button>
+    <div class="logo">ShortZone</div>
+    <div class="subtitle">Video pendek untuk semua</div>
 
-    <div id="error"></div>
+    <div id="loginForm">
+      <input id="loginUsername" type="text" placeholder="Username">
+      <input id="loginPassword" type="password" placeholder="Password">
+
+      <button onclick="login()">Masuk</button>
+
+      <div class="switch">
+        Belum punya akun?
+        <span onclick="showRegister()">Daftar</span>
+      </div>
+    </div>
+
+    <div id="registerForm" style="display:none">
+      <input id="registerUsername" type="text" placeholder="Username">
+      <input id="registerPassword" type="password" placeholder="Password">
+      <input id="registerPassword2" type="password" placeholder="Ulangi password">
+
+      <button onclick="register()">Buat Akun</button>
+
+      <div class="switch">
+        Sudah punya akun?
+        <span onclick="showLogin()">Masuk</span>
+      </div>
+    </div>
+
+    <div id="error" class="error"></div>
+
   </div>
 </div>
 
-<div id="mainPage">
 
-  <div id="feed">
-    <div class="empty">Memuat ShortZone...</div>
+<!-- HOME -->
+<div id="homePage" class="page">
+
+  <div class="topbar">
+    <div class="brand">ShortZone</div>
+    <button class="logout" onclick="logout()">Keluar</button>
   </div>
 
-  <div id="uploadPage">
-    <div class="pageHeader">Upload Video</div>
-
-    <div class="uploadBox">
-
-      <input
-        id="videoFile"
-        class="input"
-        type="file"
-        accept="video/*"
-      >
-
-      <input
-        id="captionInput"
-        class="input"
-        type="text"
-        maxlength="150"
-        placeholder="Tulis caption..."
-      >
-
-      <button class="uploadBtn" onclick="uploadVideo()">
-        🚀 Upload Video
-      </button>
-
-      <div id="uploadStatus" class="status"></div>
-
-    </div>
+  <div id="feed" class="feed">
+    <div class="empty">Memuat video...</div>
   </div>
 
-  <div id="profilePage">
-    <div class="pageHeader">Profil</div>
+  <div id="profilePage" style="display:none">
+    <div class="profile">
 
-    <div class="profileTop">
+      <div class="avatar" id="avatar">S</div>
 
-      <img id="profileAvatar" class="avatar">
-
-      <div id="profileUsername" class="profileName">
-        Memuat...
-      </div>
+      <h2 id="profileUsername">Username</h2>
 
       <div class="stats">
         <div class="stat">
-          <b id="followersCount">0</b>
-          <span>Pengikut</span>
+          <b id="followers">0</b>
+          <small>Pengikut</small>
         </div>
 
         <div class="stat">
-          <b id="followingCount">0</b>
-          <span>Mengikuti</span>
+          <b id="following">0</b>
+          <small>Mengikuti</small>
         </div>
 
         <div class="stat">
-          <b id="likesCount">0</b>
-          <span>Suka</span>
+          <b id="likes">0</b>
+          <small>Suka</small>
         </div>
       </div>
 
-      <button class="logoutBtn" onclick="logout()">
-        Keluar
-      </button>
-
     </div>
   </div>
 
-  <nav class="bottomNav">
-
-    <button class="navBtn active" onclick="showHome()">
-      <b>⌂</b>
-      Beranda
-    </button>
-
-    <button class="navBtn" onclick="showUpload()">
-      <b>＋</b>
-      Upload
-    </button>
-
-    <button class="navBtn" onclick="showProfile()">
-      <b>●</b>
-      Profil
-    </button>
-
-  </nav>
-
-</div>
-
-<div id="commentModal">
-  <div class="commentBox">
-
-    <div class="commentHeader">
-      <span>Komentar</span>
-      <button onclick="closeComments()">✕</button>
-    </div>
-
-    <div id="commentsList"></div>
-
-    <div class="commentInputRow">
-      <input
-        id="commentInput"
-        placeholder="Tulis komentar..."
-        maxlength="200"
-      >
-      <button class="sendComment" onclick="sendComment()">
-        Kirim
-      </button>
-    </div>
-
+  <div class="bottom">
+    <button class="nav active-nav" onclick="showHome()">Beranda</button>
+    <button class="nav" onclick="showProfile()">Profil</button>
   </div>
+
 </div>
+
 
 <script>
-
-/* ================================
-   FIREBASE CONFIG BARU
-================================ */
-
 const firebaseConfig = {
   apiKey: "AIzaSyARSjlrsY4yCOQhisDFFzBoankQwmruSHI",
   authDomain: "shortzone-ec194.firebaseapp.com",
@@ -448,795 +355,399 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-
-/* ================================
-   CLOUDINARY CONFIG BARU
-================================ */
-
-const CLOUD_NAME = "urmdpimx";
-const UPLOAD_PRESET = "shortzone";
-
-
 let currentUser = null;
-let currentCommentVideo = null;
 
 
-/* ================================
-   AKUN RESMI
-================================ */
+/* =========================
+   LOGIN / REGISTER
+========================= */
 
-const officialAccounts = [
-  "c00boy_",
-  "shortzone"
-];
+function showRegister(){
+  document.getElementById("loginForm").style.display="none";
+  document.getElementById("registerForm").style.display="block";
+  document.getElementById("error").textContent="";
+}
 
-function isOfficial(username){
-
-  if(!username) return false;
-
-  return officialAccounts.includes(
-    username.toLowerCase()
-  );
-
+function showLogin(){
+  document.getElementById("registerForm").style.display="none";
+  document.getElementById("loginForm").style.display="block";
+  document.getElementById("error").textContent="";
 }
 
 
-/* ================================
-   LOGIN GOOGLE
-================================ */
+async function register(){
 
-async function loginGoogle(){
+  const username =
+    document.getElementById("registerUsername").value
+    .trim()
+    .toLowerCase();
 
-  const error =
-    document.getElementById("error");
+  const password =
+    document.getElementById("registerPassword").value;
 
-  error.textContent =
-    "Membuka login Google...";
+  const password2 =
+    document.getElementById("registerPassword2").value;
+
+  const error = document.getElementById("error");
+
+  error.textContent="";
+
+  if(username.length < 3){
+    error.textContent="Username minimal 3 karakter.";
+    return;
+  }
+
+  if(!/^[a-zA-Z0-9_]+$/.test(username)){
+    error.textContent="Username hanya boleh huruf, angka, dan _.";
+    return;
+  }
+
+  if(password.length < 6){
+    error.textContent="Password minimal 6 karakter.";
+    return;
+  }
+
+  if(password !== password2){
+    error.textContent="Password tidak sama.";
+    return;
+  }
 
   try{
 
-    const provider =
-      new firebase.auth.GoogleAuthProvider();
+    /* cek username */
+    const usernameCheck = await db
+      .collection("users")
+      .where("username","==",username)
+      .limit(1)
+      .get();
 
-    provider.setCustomParameters({
-      prompt:"select_account"
-    });
+    if(!usernameCheck.empty){
+      error.textContent="Nama akun sudah digunakan.";
+      return;
+    }
 
-    await auth.signInWithPopup(provider);
+    /*
+      Firebase Email/Password membutuhkan email.
+      Kita buat email internal berdasarkan username.
+      User tetap login menggunakan username.
+    */
+    const internalEmail =
+      username + "@shortzone.local";
+
+    const result =
+      await auth.createUserWithEmailAndPassword(
+        internalEmail,
+        password
+      );
+
+    await db.collection("users")
+      .doc(result.user.uid)
+      .set({
+        username:username,
+        followers:0,
+        following:0,
+        likes:0,
+        verified:false,
+        canUpload:true,
+        canComment:true,
+        canLike:true,
+        canFollow:true,
+        createdAt:firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+    error.textContent="Akun berhasil dibuat!";
 
   }catch(e){
 
     console.error(e);
 
-    error.textContent =
-      "Terjadi kesalahan: " + e.message;
-
+    if(e.code === "auth/email-already-in-use"){
+      error.textContent="Nama akun sudah digunakan.";
+    }else{
+      error.textContent="Gagal membuat akun: " + e.message;
+    }
   }
-
 }
 
 
-/* ================================
-   LOGIN STATE
-================================ */
+async function login(){
 
-auth.onAuthStateChanged(async user => {
+  const username =
+    document.getElementById("loginUsername").value
+    .trim()
+    .toLowerCase();
+
+  const password =
+    document.getElementById("loginPassword").value;
+
+  const error =
+    document.getElementById("error");
+
+  error.textContent="";
+
+  if(!username || !password){
+    error.textContent="Masukkan username dan password.";
+    return;
+  }
+
+  try{
+
+    /*
+      Cari username di Firestore
+      untuk mendapatkan UID akun.
+    */
+
+    const result = await db
+      .collection("users")
+      .where("username","==",username)
+      .limit(1)
+      .get();
+
+    if(result.empty){
+      error.textContent="Username atau password salah.";
+      return;
+    }
+
+    const userData = result.docs[0].data();
+
+    /*
+      Email internal yang sama dengan
+      saat pendaftaran.
+    */
+
+    const internalEmail =
+      username + "@shortzone.local";
+
+    await auth.signInWithEmailAndPassword(
+      internalEmail,
+      password
+    );
+
+  }catch(e){
+
+    console.error(e);
+
+    error.textContent="Username atau password salah.";
+  }
+}
+
+
+/* =========================
+   AUTH STATE
+========================= */
+
+auth.onAuthStateChanged(async(user)=>{
 
   if(user){
 
-    currentUser = user;
-
-    await createUserIfNeeded();
+    currentUser=user;
 
     document.getElementById("loginPage")
-      .style.display = "none";
+      .classList.remove("active");
 
-    document.getElementById("mainPage")
-      .style.display = "block";
+    document.getElementById("homePage")
+      .classList.add("active");
 
-    loadVideos();
+    loadFeed();
     loadProfile();
 
   }else{
 
-    currentUser = null;
+    currentUser=null;
+
+    document.getElementById("homePage")
+      .classList.remove("active");
 
     document.getElementById("loginPage")
-      .style.display = "flex";
-
-    document.getElementById("mainPage")
-      .style.display = "none";
-
+      .classList.add("active");
   }
 
 });
 
 
-/* ================================
-   BUAT USER
-================================ */
+/* =========================
+   LOGOUT
+========================= */
 
-async function createUserIfNeeded(){
+async function logout(){
 
-  const ref =
-    db.collection("users")
-      .doc(currentUser.uid);
-
-  const snap =
-    await ref.get();
-
-  if(!snap.exists){
-
-    const username =
-      "user_" +
-      Math.floor(
-        100000 +
-        Math.random() * 900000
-      );
-
-    await ref.set({
-
-      uid:currentUser.uid,
-
-      username:username,
-
-      usernameLower:
-        username.toLowerCase(),
-
-      displayName:
-        currentUser.displayName || "User",
-
-      photoURL:
-        currentUser.photoURL || "",
-
-      followers:0,
-
-      following:0,
-
-      likes:0,
-
-      verified:false,
-
-      canUpload:true,
-
-      canComment:true,
-
-      canLike:true,
-
-      canFollow:true,
-
-      createdAt:
-        firebase.firestore.FieldValue
-        .serverTimestamp()
-
-    });
-
-  }
+  await auth.signOut();
 
 }
 
 
-/* ================================
-   DATA USER
-================================ */
+/* =========================
+   HOME
+========================= */
 
-async function getMyUser(){
+function showHome(){
 
-  if(!currentUser) return null;
+  document.getElementById("feed").style.display="block";
+  document.getElementById("profilePage").style.display="none";
 
-  const snap =
-    await db.collection("users")
-      .doc(currentUser.uid)
-      .get();
+  document.querySelectorAll(".nav")
+    .forEach(x=>x.classList.remove("active-nav"));
 
-  return snap.exists
-    ? snap.data()
-    : null;
+  document.querySelector(".nav")
+    .classList.add("active-nav");
 
 }
 
 
-/* ================================
-   LOAD VIDEO
-================================ */
+function showProfile(){
 
-function loadVideos(){
+  document.getElementById("feed").style.display="none";
+  document.getElementById("profilePage").style.display="block";
 
-  const feed =
-    document.getElementById("feed");
+  document.querySelectorAll(".nav")
+    .forEach(x=>x.classList.remove("active-nav"));
 
-  db.collection("videos")
-    .orderBy("createdAt","desc")
-    .onSnapshot(snapshot => {
-
-      feed.innerHTML = "";
-
-      if(snapshot.empty){
-
-        feed.innerHTML = `
-          <div class="empty">
-            Belum ada video.<br>
-            Jadilah orang pertama yang upload!
-          </div>
-        `;
-
-        return;
-      }
-
-      snapshot.forEach(doc => {
-
-        feed.appendChild(
-          createVideoElement(
-            doc.id,
-            doc.data()
-          )
-        );
-
-      });
-
-    },error => {
-
-      console.error(error);
-
-      feed.innerHTML = `
-        <div class="empty">
-          Gagal memuat video.
-        </div>
-      `;
-
-    });
+  document.querySelectorAll(".nav")[1]
+    .classList.add("active-nav");
 
 }
 
 
-/* ================================
-   VIDEO ELEMENT
-================================ */
-
-function createVideoElement(id,data){
-
-  const item =
-    document.createElement("div");
-
-  item.className = "videoItem";
-
-  const username =
-    data.username || "user";
-
-  item.innerHTML = `
-
-    <video
-      src="${escapeHtml(data.videoUrl || "")}"
-      loop
-      playsinline
-      preload="metadata"
-      onclick="toggleVideo(this)"
-    ></video>
-
-    <div class="videoInfo">
-
-      <div class="username">
-        @${escapeHtml(username)}
-
-        ${
-          isOfficial(username)
-          ? '<span class="verified">✓</span>'
-          : ''
-        }
-
-      </div>
-
-      <div class="caption">
-        ${escapeHtml(data.caption || "")}
-      </div>
-
-    </div>
-
-    <div class="actions">
-
-      <button
-        class="actionBtn"
-        id="like-${id}"
-        onclick="likeVideo('${id}')"
-      >♡</button>
-
-      <div
-        class="actionCount"
-        id="likes-${id}"
-      >${data.likes || 0}</div>
-
-      <button
-        class="actionBtn"
-        onclick="openComments('${id}')"
-      >💬</button>
-
-      <div
-        class="actionCount"
-        id="comments-${id}"
-      >0</div>
-
-    </div>
-  `;
-
-  loadLikeState(id);
-  loadCommentCount(id);
-
-  return item;
-
-}
-
-
-/* ================================
-   PLAY VIDEO
-================================ */
-
-function toggleVideo(video){
-
-  if(video.paused){
-
-    document.querySelectorAll("video")
-      .forEach(v => {
-
-        if(v !== video)
-          v.pause();
-
-      });
-
-    video.play().catch(()=>{});
-
-  }else{
-
-    video.pause();
-
-  }
-
-}
-
-
-/* ================================
-   LIKE
-================================ */
-
-async function likeVideo(videoId){
-
-  if(!currentUser) return;
-
-  const user =
-    await getMyUser();
-
-  if(user?.canLike === false){
-
-    alert(
-      "Fitur suka dinonaktifkan untuk akun ini."
-    );
-
-    return;
-
-  }
-
-  const likeRef =
-    db.collection("videos")
-      .doc(videoId)
-      .collection("likes")
-      .doc(currentUser.uid);
-
-  const videoRef =
-    db.collection("videos")
-      .doc(videoId);
-
-  const snap =
-    await likeRef.get();
-
-  if(snap.exists){
-
-    await likeRef.delete();
-
-    await videoRef.update({
-      likes:
-        firebase.firestore.FieldValue
-        .increment(-1)
-    });
-
-  }else{
-
-    await likeRef.set({
-
-      uid:currentUser.uid,
-
-      createdAt:
-        firebase.firestore.FieldValue
-        .serverTimestamp()
-
-    });
-
-    await videoRef.update({
-      likes:
-        firebase.firestore.FieldValue
-        .increment(1)
-    });
-
-  }
-
-  loadLikeState(videoId);
-
-}
-
-
-/* ================================
-   LIKE STATE
-================================ */
-
-async function loadLikeState(videoId){
-
-  if(!currentUser) return;
-
-  const ref =
-    db.collection("videos")
-      .doc(videoId)
-      .collection("likes")
-      .doc(currentUser.uid);
-
-  const snap =
-    await ref.get();
-
-  const button =
-    document.getElementById(
-      "like-" + videoId
-    );
-
-  if(!button) return;
-
-  if(snap.exists){
-
-    button.textContent = "♥";
-    button.classList.add("liked");
-
-  }else{
-
-    button.textContent = "♡";
-    button.classList.remove("liked");
-
-  }
-
-}
-
-
-/* ================================
-   KOMENTAR
-================================ */
-
-function openComments(videoId){
-
-  currentCommentVideo = videoId;
-
-  document.getElementById("commentModal")
-    .style.display = "flex";
-
-  loadComments(videoId);
-
-}
-
-function closeComments(){
-
-  document.getElementById("commentModal")
-    .style.display = "none";
-
-  currentCommentVideo = null;
-
-}
-
-function loadComments(videoId){
-
-  db.collection("videos")
-    .doc(videoId)
-    .collection("comments")
-    .orderBy("createdAt","asc")
-    .onSnapshot(snapshot => {
-
-      const list =
-        document.getElementById(
-          "commentsList"
-        );
-
-      list.innerHTML = "";
-
-      if(snapshot.empty){
-
-        list.innerHTML = `
-          <div class="empty">
-            Belum ada komentar.
-          </div>
-        `;
-
-        return;
-
-      }
-
-      snapshot.forEach(doc => {
-
-        const data = doc.data();
-
-        const div =
-          document.createElement("div");
-
-        div.className = "comment";
-
-        div.innerHTML = `
-          <b>
-            @${escapeHtml(
-              data.username || "user"
-            )}
-          </b>
-          ${escapeHtml(data.text || "")}
-        `;
-
-        list.appendChild(div);
-
-      });
-
-    });
-
-}
-
-
-/* ================================
-   KIRIM KOMENTAR
-================================ */
-
-async function sendComment(){
-
-  if(
-    !currentUser ||
-    !currentCommentVideo
-  ) return;
-
-  const input =
-    document.getElementById(
-      "commentInput"
-    );
-
-  const text =
-    input.value.trim();
-
-  if(!text) return;
-
-  const user =
-    await getMyUser();
-
-  if(user?.canComment === false){
-
-    alert(
-      "Fitur komentar dinonaktifkan untuk akun ini."
-    );
-
-    return;
-
-  }
-
-  await db.collection("videos")
-    .doc(currentCommentVideo)
-    .collection("comments")
-    .add({
-
-      uid:currentUser.uid,
-
-      username:
-        user?.username || "user",
-
-      text:text,
-
-      createdAt:
-        firebase.firestore.FieldValue
-        .serverTimestamp()
-
-    });
-
-  input.value = "";
-
-}
-
-
-/* ================================
-   JUMLAH KOMENTAR
-================================ */
-
-function loadCommentCount(videoId){
-
-  db.collection("videos")
-    .doc(videoId)
-    .collection("comments")
-    .onSnapshot(snapshot => {
-
-      const el =
-        document.getElementById(
-          "comments-" + videoId
-        );
-
-      if(el)
-        el.textContent =
-          snapshot.size;
-
-    });
-
-}
-
-
-/* ================================
-   UPLOAD CLOUDINARY
-================================ */
-
-async function uploadVideo(){
-
-  if(!currentUser){
-
-    alert("Silakan login terlebih dahulu.");
-    return;
-
-  }
-
-  const user =
-    await getMyUser();
-
-  if(user?.canUpload === false){
-
-    alert(
-      "Fitur upload dinonaktifkan untuk akun ini."
-    );
-
-    return;
-
-  }
-
-  const file =
-    document.getElementById(
-      "videoFile"
-    ).files[0];
-
-  const caption =
-    document.getElementById(
-      "captionInput"
-    ).value.trim();
-
-  const status =
-    document.getElementById(
-      "uploadStatus"
-    );
-
-  if(!file){
-
-    alert("Pilih video terlebih dahulu.");
-    return;
-
-  }
-
-  if(!file.type.startsWith("video/")){
-
-    alert("File harus berupa video.");
-    return;
-
-  }
-
-  status.textContent =
-    "Mengupload video...";
-
-  try{
-
-    const formData =
-      new FormData();
-
-    formData.append(
-      "file",
-      file
-    );
-
-    formData.append(
-      "upload_preset",
-      UPLOAD_PRESET
-    );
-
-    const response =
-      await fetch(
-        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`,
-        {
-          method:"POST",
-          body:formData
-        }
-      );
-
-    const result =
-      await response.json();
-
-    if(!response.ok){
-
-      throw new Error(
-        result.error?.message ||
-        "Upload gagal"
-      );
-
-    }
-
-    await db.collection("videos")
-      .add({
-
-        videoUrl:
-          result.secure_url,
-
-        publicId:
-          result.public_id || "",
-
-        uid:
-          currentUser.uid,
-
-        username:
-          user?.username || "user",
-
-        caption:
-          caption,
-
-        likes:0,
-
-        createdAt:
-          firebase.firestore.FieldValue
-          .serverTimestamp()
-
-      });
-
-    document.getElementById("videoFile")
-      .value = "";
-
-    document.getElementById("captionInput")
-      .value = "";
-
-    status.textContent =
-      "✅ Video berhasil diupload!";
-
-  }catch(error){
-
-    console.error(error);
-
-    status.textContent =
-      "❌ " + error.message;
-
-  }
-
-}
-
-
-/* ================================
+/* =========================
    PROFILE
-================================ */
+========================= */
 
 async function loadProfile(){
 
-  const user =
-    await getMyUser();
+  if(!currentUser) return;
 
-  if(!user) return;
+  try{
 
-  document.getElementById(
-    "profileUsername"
-  ).innerHTML =
-    "@" +
-    escapeHtml(
-      user.username || "user"
-    ) +
-    (
-      isOfficial(user.username)
-      ? ' <span class="verified">✓</span>'
-      : ''
-    );
+    const doc = await db
+      .collection("users")
+      .doc(currentUser.uid)
+      .get();
 
-  document.getElementById(
-    "profileAvatar"
-  ).src =
-    user.photoURL ||
-    currentUser.photoURL ||
-    "https://www.gravatar.com/avatar/?d=mp";
+    if(!doc.exists) return;
 
-  document.getElementById(
-    "followersCount"
-  ).textContent =
-    user.followers || 0;
+    const data=doc.data();
 
-  document.getElementById(
-    "followingCount"
+    const username=data.username || "User";
+
+    document.getElementById("profileUsername")
+      .textContent=username;
+
+    document.getElementById("avatar")
+      .textContent=username
+      .charAt(0)
+      .toUpperCase();
+
+    document.getElementById("followers")
+      .textContent=data.followers || 0;
+
+    document.getElementById("following")
+      .textContent=data.following || 0;
+
+    document.getElementById("likes")
+      .textContent=data.likes || 0;
+
+  }catch(e){
+
+    console.error(e);
+
+  }
+
+}
+
+
+/* =========================
+   VIDEO FEED
+========================= */
+
+async function loadFeed(){
+
+  const feed=document.getElementById("feed");
+
+  feed.innerHTML=
+    '<div class="empty">Memuat video...</div>';
+
+  try{
+
+    const snapshot = await db
+      .collection("videos")
+      .orderBy("createdAt","desc")
+      .limit(30)
+      .get();
+
+    if(snapshot.empty){
+
+      feed.innerHTML=
+        '<div class="empty">Belum ada video.</div>';
+
+      return;
+    }
+
+    feed.innerHTML="";
+
+    snapshot.forEach(doc=>{
+
+      const data=doc.data();
+
+      const card=document.createElement("div");
+
+      card.className="video-card";
+
+      const username =
+        data.username || "User";
+
+      const verified =
+        data.verified === true
+        ? '<span class="verified"> ✓</span>'
+        : "";
+
+      card.innerHTML=`
+
+        <video
+          src="${escapeHtml(data.videoUrl || "")}"
+          controls
+          playsinline
+          preload="metadata">
+        </video>
+
+        <div class="video-info">
+          <div class="username">
+            @${escapeHtml(username)}
+            ${verified}
+          </div>
+        </div>
+      `;
+
+      feed.appendChild(card);
+
+    });
+
+  }catch(e){
+
+    console.error(e);
+
+    feed.innerHTML=
+      '<div class="empty">Gagal memuat video.</div>';
+
+  }
+
+}
+
+
+/* =========================
+   SECURITY HELPER
+========================= */
+
+function escapeHtml(text){
+
+  return String(text)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+</script>
+
+</body>
+</html>
