@@ -2,752 +2,1276 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ShortZone</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Short Zone</title>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <style>
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-  font-family:Arial,sans-serif;
-}
+*{box-sizing:border-box}
+body{margin:0;background:#000;color:#fff;font-family:Arial;overflow:hidden}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
 
-body{
-  background:#000;
-  color:white;
-}
+.app{max-width:600px;margin:auto;height:100vh;background:#000}
 
-.page{
-  min-height:100vh;
-  display:none;
+.top{
+ position:fixed;top:0;left:0;right:0;height:58px;z-index:20;
+ display:flex;align-items:center;padding:0 16px;
+ background:rgba(0,0,0,.86);backdrop-filter:blur(8px)
 }
+.logo{font-size:21px;font-weight:800}
 
-.active{
-  display:block;
-}
-
-/* LOGIN */
-#loginPage{
-  min-height:100vh;
-  background:linear-gradient(160deg,#071dff,#00aaff);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-}
-
-.login-box{
-  width:100%;
-  max-width:400px;
-  background:rgba(0,0,0,.85);
-  border-radius:25px;
-  padding:30px 22px;
-  box-shadow:0 10px 40px rgba(0,0,0,.4);
-}
-
-.logo{
-  text-align:center;
-  font-size:36px;
-  font-weight:900;
-  margin-bottom:8px;
-}
-
-.subtitle{
-  text-align:center;
-  color:#bbb;
-  margin-bottom:25px;
-}
-
-input{
-  width:100%;
-  padding:15px;
-  margin:7px 0;
-  border:0;
-  outline:none;
-  border-radius:13px;
-  background:#222;
-  color:white;
-  font-size:16px;
-}
-
-button{
-  width:100%;
-  padding:15px;
-  margin-top:10px;
-  border:0;
-  border-radius:13px;
-  background:#1683ff;
-  color:white;
-  font-size:16px;
-  font-weight:bold;
-}
-
-button:active{
-  transform:scale(.98);
-}
-
-.switch{
-  text-align:center;
-  margin-top:18px;
-  color:#aaa;
-}
-
-.switch span{
-  color:#3ca9ff;
-  font-weight:bold;
-}
-
-.error{
-  color:#ff5252;
-  text-align:center;
-  margin-top:12px;
-  min-height:20px;
-}
-
-/* HOME */
-#homePage{
-  min-height:100vh;
-  background:#050505;
-  padding-bottom:80px;
-}
-
-.topbar{
-  height:60px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 16px;
-  background:#080808;
-  border-bottom:1px solid #222;
-  position:sticky;
-  top:0;
-  z-index:10;
-}
-
-.brand{
-  font-size:25px;
-  font-weight:900;
-}
-
-.logout{
-  width:auto;
-  padding:9px 14px;
-  margin:0;
-  background:#222;
-  font-size:13px;
-}
+.page{display:none;height:100vh;overflow:auto;padding:58px 0 70px}
+.page.active{display:block}
 
 .feed{
-  max-width:600px;
-  margin:auto;
+ height:100vh;overflow-y:auto;padding-top:58px;padding-bottom:64px;
+ scroll-snap-type:y mandatory
 }
 
-.video-card{
-  min-height:620px;
-  border-bottom:1px solid #222;
-  position:relative;
-  background:#111;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+.vid{
+ height:calc(100vh - 58px);
+ position:relative;background:#000;
+ scroll-snap-align:start;
+ display:flex;align-items:center;justify-content:center
 }
 
-.video-card video{
-  width:100%;
-  max-height:760px;
-  object-fit:cover;
+.vid video{
+ width:100%;height:100%;object-fit:contain;background:#000
 }
 
-.video-info{
-  position:absolute;
-  bottom:20px;
-  left:15px;
-  right:15px;
-  background:linear-gradient(transparent,rgba(0,0,0,.85));
-  padding-top:80px;
+.info{
+ position:absolute;left:14px;bottom:82px;max-width:72%;
+ z-index:5;text-shadow:0 1px 5px #000;line-height:1.4
 }
 
-.username{
-  font-weight:bold;
-  font-size:17px;
+.actions{
+ position:absolute;right:10px;bottom:82px;z-index:5;
+ display:flex;flex-direction:column;align-items:center;gap:5px
 }
 
-.verified{
-  color:#1683ff;
-  font-size:17px;
+.act{
+ width:48px;height:48px;border:0;border-radius:50%;
+ background:rgba(0,0,0,.4);color:#fff;font-size:28px
 }
 
-.empty{
-  text-align:center;
-  padding:80px 20px;
-  color:#888;
-}
+.act.liked{color:red}
+.count{font-size:12px;margin-bottom:5px}
 
-.bottom{
-  position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
-  height:65px;
-  background:#090909;
-  border-top:1px solid #222;
-  display:flex;
-  justify-content:space-around;
-  align-items:center;
-  z-index:20;
+.verify{
+ display:inline-flex;align-items:center;justify-content:center;
+ width:17px;height:17px;border-radius:50%;
+ background:#1683ff;color:#fff;font-size:10px;font-weight:bold;
+ vertical-align:middle
 }
 
 .nav{
-  background:none;
-  width:auto;
-  margin:0;
-  padding:8px 20px;
-  font-size:13px;
+ position:fixed;bottom:0;left:0;right:0;height:64px;z-index:30;
+ display:flex;justify-content:center;background:#0a0a0a;
+ border-top:1px solid #222
 }
 
-.nav.active-nav{
-  color:#1683ff;
+.nav button{
+ flex:1;max-width:120px;border:0;background:none;
+ color:#aaa;font-size:24px
 }
 
-.profile{
-  max-width:600px;
-  margin:auto;
-  padding:35px 20px;
-  text-align:center;
+.nav small{display:block;font-size:10px}
+
+.box{padding:18px}
+
+input,textarea,select{
+ width:100%;padding:13px;margin:7px 0;border-radius:10px;
+ border:1px solid #333;background:#151515;color:#fff
 }
 
-.avatar{
-  width:90px;
-  height:90px;
-  border-radius:50%;
-  background:#1683ff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:35px;
-  font-weight:bold;
-  margin:auto auto 15px;
+textarea{min-height:100px}
+
+.primary{
+ width:100%;padding:13px;margin-top:8px;border:0;
+ border-radius:10px;background:#1683ff;color:#fff;font-weight:bold
 }
+
+.secondary{
+ padding:10px 14px;border:1px solid #444;
+ border-radius:9px;background:#151515;color:#fff
+}
+
+.searchrow{display:flex;gap:7px;padding:12px}
+.searchrow input{margin:0;flex:1}
+.searchrow button{
+ width:55px;border:0;border-radius:10px;
+ background:#1683ff;color:#fff
+}
+
+.result{
+ display:flex;align-items:center;gap:12px;padding:12px 16px;
+ border-bottom:1px solid #222
+}
+
+.resulttext{flex:1}
+.resulttext b{display:block}
+.resulttext span{color:#aaa;font-size:13px}
+
+.follow{
+ border:0;border-radius:9px;background:#1683ff;
+ color:#fff;padding:9px 14px;font-weight:bold
+}
+
+.avatar,.bigavatar{
+ border-radius:50%;
+ background:linear-gradient(135deg,#1683ff,#6b20ff);
+ display:flex;align-items:center;justify-content:center;
+ overflow:hidden;font-weight:900
+}
+
+.avatar{width:48px;height:48px;min-width:48px}
+.bigavatar{width:105px;height:105px;margin:auto;font-size:40px}
+
+.avatar img,.bigavatar img{
+ width:100%;height:100%;object-fit:cover
+}
+
+.profileHead{text-align:center;padding:25px 18px}
+.profileHead h2{margin:13px 0 5px}
+.username{color:#aaa}
+.bio{color:#ddd;max-width:430px;margin:13px auto}
 
 .stats{
-  display:flex;
-  justify-content:center;
-  gap:35px;
-  margin-top:25px;
+ display:flex;justify-content:center;gap:38px;margin:20px 0
 }
 
-.stat b{
-  display:block;
-  font-size:20px;
+.stats b{display:block;font-size:18px}
+.stats span{color:#aaa;font-size:12px}
+
+.profileVideos{
+ display:grid;grid-template-columns:repeat(3,1fr);gap:2px
 }
 
-.stat small{
-  color:#888;
+.profileVideos video{
+ width:100%;aspect-ratio:9/14;
+ object-fit:cover;background:#111
+}
+
+.comment{
+ display:flex;gap:10px;padding:10px 0;
+ border-bottom:1px solid #222
+}
+
+.comment .avatar{
+ width:38px;height:38px;min-width:38px;font-size:13px
+}
+
+.commentmain{flex:1}
+.commentmain p{margin:5px 0;color:#ddd}
+
+.commentlike{
+ border:0;background:none;color:#aaa
+}
+
+.commentlike.liked{color:red}
+
+.message{
+ max-width:80%;margin:7px;padding:10px 13px;
+ border-radius:13px;background:#202020
+}
+
+.message.me{
+ margin-left:auto;background:#1683ff
+}
+
+.modal{
+ display:none;position:fixed;inset:0;z-index:100;
+ background:rgba(0,0,0,.8);
+ align-items:center;justify-content:center;padding:20px
+}
+
+.modal.show{display:flex}
+
+.modalbox{
+ width:100%;max-width:500px;max-height:90vh;
+ overflow:auto;background:#111;border:1px solid #333;
+ border-radius:15px;padding:18px
 }
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
-<div id="loginPage" class="page active">
-  <div class="login-box">
+<div class="app">
 
-    <div class="logo">ShortZone</div>
-    <div class="subtitle">Video pendek untuk semua</div>
+<header class="top">
+ <div class="logo">Short Zone</div>
+</header>
 
-    <div id="loginForm">
-      <input id="loginUsername" type="text" placeholder="Username">
-      <input id="loginPassword" type="password" placeholder="Password">
+<!-- BERANDA -->
+<section id="home" class="page active">
+ <div id="feed" class="feed"></div>
+</section>
 
-      <button onclick="login()">Masuk</button>
+<!-- CARI -->
+<section id="search" class="page">
 
-      <div class="switch">
-        Belum punya akun?
-        <span onclick="showRegister()">Daftar</span>
-      </div>
-    </div>
+ <div class="searchrow">
+  <input id="searchInput" placeholder="Cari pengguna atau video...">
+  <button onclick="searchAll()">⌕</button>
+ </div>
 
-    <div id="registerForm" style="display:none">
-      <input id="registerUsername" type="text" placeholder="Username">
-      <input id="registerPassword" type="password" placeholder="Password">
-      <input id="registerPassword2" type="password" placeholder="Ulangi password">
+ <div class="box">
+  <select id="searchType">
+   <option value="users">Cari pengguna</option>
+   <option value="videos">Cari video</option>
+  </select>
+ </div>
 
-      <button onclick="register()">Buat Akun</button>
+ <div id="searchResults"></div>
+</section>
 
-      <div class="switch">
-        Sudah punya akun?
-        <span onclick="showLogin()">Masuk</span>
-      </div>
-    </div>
+<!-- BUAT -->
+<section id="create" class="page">
+ <div class="box">
 
-    <div id="error" class="error"></div>
+  <h2>Buat Video</h2>
 
-  </div>
+  <input id="videoFile" type="file" accept="video/*">
+
+  <textarea id="caption"
+   placeholder="Tulis caption..."></textarea>
+
+  <button class="primary" onclick="uploadVideo()">
+   Posting Video
+  </button>
+
+  <p id="uploadStatus"></p>
+
+ </div>
+</section>
+
+<!-- CHAT -->
+<section id="chat" class="page">
+
+ <div class="box">
+
+  <h2>Chat</h2>
+
+  <input id="chatUser"
+   placeholder="Username tujuan">
+
+  <button class="primary" onclick="openChat()">
+   Buka Chat
+  </button>
+
+ </div>
+
+ <div id="chatArea"></div>
+
+</section>
+
+<!-- PROFIL -->
+<section id="profile" class="page">
+ <div id="profileContent"></div>
+</section>
+
+<!-- NAVIGASI -->
+<nav class="nav">
+
+ <button onclick="go('home')">
+  ⌂<small>Beranda</small>
+ </button>
+
+ <button onclick="go('search')">
+  ⌕<small>Cari</small>
+ </button>
+
+ <button onclick="go('create')">
+  ＋<small>Buat</small>
+ </button>
+
+ <button onclick="go('chat')">
+  ♡<small>Chat</small>
+ </button>
+
+ <button onclick="go('profile')">
+  ◯<small>Profil</small>
+ </button>
+
+</nav>
+
 </div>
 
+<!-- EDIT PROFIL -->
+<div id="editModal" class="modal">
 
-<!-- HOME -->
-<div id="homePage" class="page">
+ <div class="modalbox">
 
-  <div class="topbar">
-    <div class="brand">ShortZone</div>
-    <button class="logout" onclick="logout()">Keluar</button>
-  </div>
+  <h2>Edit Profil</h2>
 
-  <div id="feed" class="feed">
-    <div class="empty">Memuat video...</div>
-  </div>
+  <input id="editName"
+   value="Short Zone" disabled>
 
-  <div id="profilePage" style="display:none">
-    <div class="profile">
+  <input id="editUsername"
+   value="shortzone" disabled>
 
-      <div class="avatar" id="avatar">S</div>
+  <textarea id="editBio"
+   placeholder="Bio..."></textarea>
 
-      <h2 id="profileUsername">Username</h2>
+  <input id="editPhoto"
+   type="file" accept="image/*">
 
-      <div class="stats">
-        <div class="stat">
-          <b id="followers">0</b>
-          <small>Pengikut</small>
-        </div>
+  <button class="primary" onclick="saveProfile()">
+   Simpan
+  </button>
 
-        <div class="stat">
-          <b id="following">0</b>
-          <small>Mengikuti</small>
-        </div>
+  <button class="secondary"
+   style="width:100%;margin-top:8px"
+   onclick="closeEdit()">
+   Batal
+  </button>
 
-        <div class="stat">
-          <b id="likes">0</b>
-          <small>Suka</small>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <div class="bottom">
-    <button class="nav active-nav" onclick="showHome()">Beranda</button>
-    <button class="nav" onclick="showProfile()">Profil</button>
-  </div>
+ </div>
 
 </div>
-
 
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyARSjlrsY4yCOQhisDFFzBoankQwmruSHI",
-  authDomain: "shortzone-ec194.firebaseapp.com",
-  projectId: "shortzone-ec194",
-  storageBucket: "shortzone-ec194.firebasestorage.app",
-  messagingSenderId: "9616384408",
-  appId: "1:9616384408:web:f4589631c58a3a75d1cbed",
-  measurementId: "G-26BVG3X4B8"
-};
-
-firebase.initializeApp(firebaseConfig);
-
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-let currentUser = null;
-
 
 /* =========================
-   LOGIN / REGISTER
+   FIREBASE
 ========================= */
 
-function showRegister(){
-  document.getElementById("loginForm").style.display="none";
-  document.getElementById("registerForm").style.display="block";
-  document.getElementById("error").textContent="";
-}
-
-function showLogin(){
-  document.getElementById("registerForm").style.display="none";
-  document.getElementById("loginForm").style.display="block";
-  document.getElementById("error").textContent="";
-}
-
-
-async function register(){
-
-  const username =
-    document.getElementById("registerUsername").value
-    .trim()
-    .toLowerCase();
-
-  const password =
-    document.getElementById("registerPassword").value;
-
-  const password2 =
-    document.getElementById("registerPassword2").value;
-
-  const error = document.getElementById("error");
-
-  error.textContent="";
-
-  if(username.length < 3){
-    error.textContent="Username minimal 3 karakter.";
-    return;
-  }
-
-  if(!/^[a-zA-Z0-9_]+$/.test(username)){
-    error.textContent="Username hanya boleh huruf, angka, dan _.";
-    return;
-  }
-
-  if(password.length < 6){
-    error.textContent="Password minimal 6 karakter.";
-    return;
-  }
-
-  if(password !== password2){
-    error.textContent="Password tidak sama.";
-    return;
-  }
-
-  try{
-
-    /* cek username */
-    const usernameCheck = await db
-      .collection("users")
-      .where("username","==",username)
-      .limit(1)
-      .get();
-
-    if(!usernameCheck.empty){
-      error.textContent="Nama akun sudah digunakan.";
-      return;
-    }
-
-    /*
-      Firebase Email/Password membutuhkan email.
-      Kita buat email internal berdasarkan username.
-      User tetap login menggunakan username.
-    */
-    const internalEmail =
-      username + "@shortzone.local";
-
-    const result =
-      await auth.createUserWithEmailAndPassword(
-        internalEmail,
-        password
-      );
-
-    await db.collection("users")
-      .doc(result.user.uid)
-      .set({
-        username:username,
-        followers:0,
-        following:0,
-        likes:0,
-        verified:false,
-        canUpload:true,
-        canComment:true,
-        canLike:true,
-        canFollow:true,
-        createdAt:firebase.firestore.FieldValue.serverTimestamp()
-      });
-
-    error.textContent="Akun berhasil dibuat!";
-
-  }catch(e){
-
-    console.error(e);
-
-    if(e.code === "auth/email-already-in-use"){
-      error.textContent="Nama akun sudah digunakan.";
-    }else{
-      error.textContent="Gagal membuat akun: " + e.message;
-    }
-  }
-}
-
-
-async function login(){
-
-  const username =
-    document.getElementById("loginUsername").value
-    .trim()
-    .toLowerCase();
-
-  const password =
-    document.getElementById("loginPassword").value;
-
-  const error =
-    document.getElementById("error");
-
-  error.textContent="";
-
-  if(!username || !password){
-    error.textContent="Masukkan username dan password.";
-    return;
-  }
-
-  try{
-
-    /*
-      Cari username di Firestore
-      untuk mendapatkan UID akun.
-    */
-
-    const result = await db
-      .collection("users")
-      .where("username","==",username)
-      .limit(1)
-      .get();
-
-    if(result.empty){
-      error.textContent="Username atau password salah.";
-      return;
-    }
-
-    const userData = result.docs[0].data();
-
-    /*
-      Email internal yang sama dengan
-      saat pendaftaran.
-    */
-
-    const internalEmail =
-      username + "@shortzone.local";
-
-    await auth.signInWithEmailAndPassword(
-      internalEmail,
-      password
-    );
-
-  }catch(e){
-
-    console.error(e);
-
-    error.textContent="Username atau password salah.";
-  }
-}
-
-
-/* =========================
-   AUTH STATE
-========================= */
-
-auth.onAuthStateChanged(async(user)=>{
-
-  if(user){
-
-    currentUser=user;
-
-    document.getElementById("loginPage")
-      .classList.remove("active");
-
-    document.getElementById("homePage")
-      .classList.add("active");
-
-    loadFeed();
-    loadProfile();
-
-  }else{
-
-    currentUser=null;
-
-    document.getElementById("homePage")
-      .classList.remove("active");
-
-    document.getElementById("loginPage")
-      .classList.add("active");
-  }
-
+firebase.initializeApp({
+ apiKey:"AIzaSyARSjlrsYyCOQhisDFFzBoankQwmSHI",
+ authDomain:"shortzone-ec194.firebaseapp.com",
+ projectId:"shortzone-ec194",
+ storageBucket:"shortzone-ec194.firebasestorage.app",
+ messagingSenderId:"9616384408",
+ appId:"1:9616384408:web:f4589631c58a3a75d1cbed"
 });
 
+const db=firebase.firestore();
+
+const USER="shortzone";
+
+const CLOUDINARY_URL=
+"https://api.cloudinary.com/v1_1/urmdpim/video/upload";
+
+const UPLOAD_PRESET="shortzone";
+
 
 /* =========================
-   LOGOUT
+   AKUN RESMI
 ========================= */
 
-async function logout(){
+const OFFICIAL={
+ username:"shortzone",
+ displayName:"Short Zone",
+ bio:"Akun resmi Short Zone.",
+ official:true,
+ photo:""
+};
 
-  await auth.signOut();
-
-}
+db.collection("users")
+ .doc("shortzone")
+ .set(OFFICIAL,{merge:true});
 
 
 /* =========================
-   HOME
+   UTILITAS
 ========================= */
 
-function showHome(){
+function esc(v){
+ if(v==null)return "";
 
-  document.getElementById("feed").style.display="block";
-  document.getElementById("profilePage").style.display="none";
-
-  document.querySelectorAll(".nav")
-    .forEach(x=>x.classList.remove("active-nav"));
-
-  document.querySelector(".nav")
-    .classList.add("active-nav");
-
+ return String(v)
+  .replace(/&/g,"&amp;")
+  .replace(/</g,"&lt;")
+  .replace(/>/g,"&gt;")
+  .replace(/"/g,"&quot;")
+  .replace(/'/g,"&#039;");
 }
 
+function badge(u){
+ return String(u).toLowerCase()==="shortzone"
+  ?'<span class="verify">✓</span>'
+  :"";
+}
 
-function showProfile(){
+function avatar(u,big=false){
 
-  document.getElementById("feed").style.display="none";
-  document.getElementById("profilePage").style.display="block";
+ let c=big?"bigavatar":"avatar";
 
-  document.querySelectorAll(".nav")
-    .forEach(x=>x.classList.remove("active-nav"));
+ if(u.photo){
+  return `
+   <div class="${c}">
+    <img src="${esc(u.photo)}">
+   </div>`;
+ }
 
-  document.querySelectorAll(".nav")[1]
-    .classList.add("active-nav");
+ let initial="U";
 
+ if(String(u.username).toLowerCase()==="shortzone"){
+  initial="SZ";
+ }else if(u.displayName){
+  initial=String(u.displayName)
+   .substring(0,2).toUpperCase();
+ }
+
+ return `<div class="${c}">${esc(initial)}</div>`;
+}
+
+async function getUser(u){
+
+ if(String(u).toLowerCase()==="shortzone")
+  return OFFICIAL;
+
+ let s=await db.collection("users").doc(u).get();
+
+ if(s.exists)return s.data();
+
+ return {
+  username:u,
+  displayName:u,
+  bio:"",
+  photo:"",
+  official:false
+ };
 }
 
 
 /* =========================
-   PROFILE
+   PINDAH HALAMAN
 ========================= */
 
-async function loadProfile(){
+function go(p){
 
-  if(!currentUser) return;
+ document.querySelectorAll(".page")
+  .forEach(x=>x.classList.remove("active"));
 
-  try{
+ document.getElementById(p)
+  .classList.add("active");
 
-    const doc = await db
-      .collection("users")
-      .doc(currentUser.uid)
-      .get();
+ if(p==="home")loadFeed();
 
-    if(!doc.exists) return;
-
-    const data=doc.data();
-
-    const username=data.username || "User";
-
-    document.getElementById("profileUsername")
-      .textContent=username;
-
-    document.getElementById("avatar")
-      .textContent=username
-      .charAt(0)
-      .toUpperCase();
-
-    document.getElementById("followers")
-      .textContent=data.followers || 0;
-
-    document.getElementById("following")
-      .textContent=data.following || 0;
-
-    document.getElementById("likes")
-      .textContent=data.likes || 0;
-
-  }catch(e){
-
-    console.error(e);
-
-  }
-
+ if(p==="profile")
+  loadProfile("shortzone");
 }
 
 
 /* =========================
-   VIDEO FEED
+   FEED
 ========================= */
 
 async function loadFeed(){
 
-  const feed=document.getElementById("feed");
+ let feed=document.getElementById("feed");
 
-  feed.innerHTML=
-    '<div class="empty">Memuat video...</div>';
+ let snap=await db.collection("videos")
+  .orderBy("createdAt","desc")
+  .get();
 
-  try{
+ feed.innerHTML="";
 
-    const snapshot = await db
-      .collection("videos")
-      .orderBy("createdAt","desc")
-      .limit(30)
-      .get();
+ snap.forEach(doc=>{
 
-    if(snapshot.empty){
+  let x=doc.data();
+  let likes=x.likes||[];
+  let liked=false;
 
-      feed.innerHTML=
-        '<div class="empty">Belum ada video.</div>';
-
-      return;
-    }
-
-    feed.innerHTML="";
-
-    snapshot.forEach(doc=>{
-
-      const data=doc.data();
-
-      const card=document.createElement("div");
-
-      card.className="video-card";
-
-      const username =
-        data.username || "User";
-
-      const verified =
-        data.verified === true
-        ? '<span class="verified"> ✓</span>'
-        : "";
-
-      card.innerHTML=`
-
-        <video
-          src="${escapeHtml(data.videoUrl || "")}"
-          controls
-          playsinline
-          preload="metadata">
-        </video>
-
-        <div class="video-info">
-          <div class="username">
-            @${escapeHtml(username)}
-            ${verified}
-          </div>
-        </div>
-      `;
-
-      feed.appendChild(card);
-
-    });
-
-  }catch(e){
-
-    console.error(e);
-
-    feed.innerHTML=
-      '<div class="empty">Gagal memuat video.</div>';
-
+  for(let i=0;i<likes.length;i++){
+   if(likes[i]===USER){
+    liked=true;
+    break;
+   }
   }
 
+  feed.innerHTML+=`
+
+   <div class="vid"
+    data-id="${esc(doc.id)}">
+
+    <video
+     src="${esc(x.url)}"
+     loop
+     playsinline
+     controls
+     preload="metadata">
+    </video>
+
+    <div class="info">
+
+     <b>
+      @${esc(x.username)}
+      ${badge(x.username)}
+     </b>
+
+     <br>
+
+     ${esc(x.caption||"")}
+
+    </div>
+
+    <div class="actions">
+
+     <button
+      class="act ${liked?"liked":""}"
+      onclick="toggleLike('${esc(doc.id)}',this)">
+      ${liked?"♥":"♡"}
+     </button>
+
+     <div class="count likecount">
+      ${likes.length}
+     </div>
+
+     <button
+      class="act"
+      onclick="showComments('${esc(doc.id)}')">
+      💬
+     </button>
+
+     <div class="count">
+      ${x.commentCount||0}
+     </div>
+
+     <button
+      class="act"
+      onclick="openVideoProfile('${esc(x.username)}')">
+      ◯
+     </button>
+
+    </div>
+
+   </div>
+  `;
+ });
+
+ setupVideoAutoplay();
 }
 
 
 /* =========================
-   SECURITY HELPER
+   LIKE
+   TIDAK RELOAD VIDEO
 ========================= */
 
-function escapeHtml(text){
+async function toggleLike(id,button){
 
-  return String(text)
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
+ let ref=db.collection("videos").doc(id);
 
+ let snap=await ref.get();
+
+ if(!snap.exists)return;
+
+ let likes=(snap.data().likes||[]).slice();
+
+ let pos=-1;
+
+ for(let i=0;i<likes.length;i++){
+
+  if(likes[i]===USER){
+   pos=i;
+   break;
+  }
+
+ }
+
+ if(pos>=0){
+
+  likes.splice(pos,1);
+
+  button.classList.remove("liked");
+  button.innerText="♡";
+
+ }else{
+
+  likes.push(USER);
+
+  button.classList.add("liked");
+  button.innerText="♥";
+ }
+
+ await ref.update({
+  likes:likes
+ });
+
+ let count=button.parentElement
+  .querySelector(".likecount");
+
+ if(count)
+  count.innerText=likes.length;
 }
-</script>
 
-</body>
-</html>
+
+/* =========================
+   AUTOPLAY
+========================= */
+
+function setupVideoAutoplay(){
+
+ let vids=document.querySelectorAll(".vid video");
+
+ let ob=new IntersectionObserver(entries=>{
+
+  for(let i=0;i<entries.length;i++){
+
+   let v=entries[i].target;
+
+   if(entries[i].isIntersecting &&
+      entries[i].intersectionRatio>.65){
+
+    for(let j=0;j<vids.length;j++){
+
+     if(vids[j]!==v)
+      vids[j].pause();
+
+    }
+
+    v.play().catch(()=>{});
+
+   }else{
+
+    v.pause();
+
+   }
+  }
+
+ },{
+  threshold:[0,.65,1]
+ });
+
+ vids.forEach(v=>ob.observe(v));
+}
+
+
+/* =========================
+   PROFIL
+   SUKA | PENGIKUT | MENGIKUTI
+========================= */
+
+async function loadProfile(u){
+
+ let x=await getUser(u);
+
+ let videos=await db.collection("videos")
+  .where("username","==",u)
+  .get();
+
+ let followers=await db.collection("follows")
+  .where("following","==",u)
+  .get();
+
+ let following=await db.collection("follows")
+  .where("follower","==",u)
+  .get();
+
+
+ /* TOTAL SEMUA LIKE */
+
+ let totalLikes=0;
+
+ videos.forEach(d=>{
+
+  let data=d.data();
+
+  totalLikes+=(data.likes||[]).length;
+
+ });
+
+
+ let official=
+  String(u).toLowerCase()==="shortzone";
+
+
+ document.getElementById("profileContent")
+ .innerHTML=`
+
+  <div class="profileHead">
+
+   ${avatar(x,true)}
+
+   <h2>
+
+    ${esc(
+     official
+     ?"Short Zone"
+     :(x.displayName||u)
+    )}
+
+    ${official
+     ?'<span class="verify">✓</span>'
+     :""}
+
+   </h2>
+
+   <div class="username">
+
+    @${esc(
+     official
+     ?"shortzone"
+     :(x.username||u)
+    )}
+
+    ${official
+     ?'<span class="verify">✓</span>'
+     :""}
+
+   </div>
+
+   ${
+    official
+    ?"<p><b>Akun resmi</b></p>"
+    :""
+   }
+
+   <p class="bio">
+    ${esc(x.bio||"")}
+   </p>
+
+   <div class="stats">
+
+    <div>
+     <b>${totalLikes}</b>
+     <span>Suka</span>
+    </div>
+
+    <div>
+     <b>${followers.size}</b>
+     <span>Pengikut</span>
+    </div>
+
+    <div>
+     <b>${following.size}</b>
+     <span>Mengikuti</span>
+    </div>
+
+   </div>
+
+   ${
+    official
+
+    ?'<button class="secondary" onclick="openEdit()">Edit Profil</button>'
+
+    :'<button class="follow" onclick="toggleFollow(\''+
+      esc(u)+
+      '\')">+</button>'
+   }
+
+  </div>
+
+  <div
+   class="profileVideos"
+   id="profileVideos">
+  </div>
+ `;
+
+
+ let pv=document.getElementById("profileVideos");
+
+
+ videos.forEach(d=>{
+
+  let data=d.data();
+
+  pv.innerHTML+=`
+
+   <video
+    src="${esc(data.url)}"
+    controls
+    playsinline
+    preload="metadata">
+   </video>
+
+  `;
+
+ });
+}
+
+
+/* =========================
+   BUKA PROFIL DARI VIDEO
+========================= */
+
+function openVideoProfile(u){
+
+ loadProfile(u);
+
+ go("profile");
+}
+
+
+/* =========================
+   EDIT PROFIL
+========================= */
+
+async function openEdit(){
+
+ let x=await getUser("shortzone");
+
+ document.getElementById("editBio")
+  .value=x.bio||"";
+
+ document.getElementById("editPhoto")
+  .value="";
+
+ document.getElementById("editModal")
+  .classList.add("show");
+}
+
+function closeEdit(){
+
+ document.getElementById("editModal")
+  .classList.remove("show");
+}
+
+
+function readImage(file){
+
+ return new Promise((resolve,reject)=>{
+
+  let r=new FileReader();
+
+  r.onload=()=>resolve(r.result);
+  r.onerror=reject;
+
+  r.readAsDataURL(file);
+ });
+}
+
+
+async function saveProfile(){
+
+ let bio=document.getElementById("editBio")
+  .value.trim();
+
+ let old=await getUser("shortzone");
+
+ let photo=old.photo||"";
+
+ let f=document.getElementById("editPhoto")
+  .files[0];
+
+ if(f)
+  photo=await readImage(f);
+
+
+ await db.collection("users")
+  .doc("shortzone")
+  .set({
+
+   username:"shortzone",
+   displayName:"Short Zone",
+   bio:bio||"Akun resmi Short Zone.",
+   official:true,
+   photo:photo
+
+  },{merge:true});
+
+
+ closeEdit();
+
+ loadProfile("shortzone");
+}
+
+
+/* =========================
+   KOMENTAR
+========================= */
+
+async function showComments(id){
+
+ let snap=await db.collection("videos")
+  .doc(id)
+  .collection("comments")
+  .orderBy("createdAt","asc")
+  .get();
+
+
+ let html=`
+
+  <div class="modal show"
+   id="commentModal">
+
+   <div class="modalbox">
+
+    <h3>Komentar</h3>
+
+    <div>
+ `;
+
+
+ snap.forEach(d=>{
+
+  let x=d.data();
+  let likes=x.likes||[];
+  let liked=false;
+
+  for(let i=0;i<likes.length;i++){
+
+   if(likes[i]===USER){
+    liked=true;
+    break;
+   }
+
+  }
+
+
+  html+=`
+
+   <div class="comment">
+
+    ${avatar({
+     username:x.username,
+     displayName:x.displayName,
+     photo:x.photo
+    })}
+
+    <div class="commentmain">
+
+     <b>
+      @${esc(x.username)}
+      ${badge(x.username)}
+     </b>
+
+     <p>
+      ${esc(x.text||"")}
+     </p>
+
+     <button
+      class="commentlike ${liked?"liked":""}"
+      onclick="likeComment(
+       '${esc(id)}',
+       '${esc(d.id)}'
+      )">
+
+      ${liked?"♥":"♡"}
+      ${likes.length}
+
+     </button>
+
+    </div>
+
+   </div>
+  `;
+ });
+
+
+ html+=`
+
+    </div>
+
+    <input
+     id="commentInput"
+     placeholder="Tulis komentar...">
+
+    <button
+     class="primary"
+     onclick="sendComment('${esc(id)}')">
+     Kirim
+    </button>
+
+    <button
+     class="secondary"
+     style="width:100%;margin-top:8px"
+     onclick="closeComment()">
+     Tutup
+    </button>
+
+   </div>
+  </div>
+ `;
+
+
+ document.body.insertAdjacentHTML(
+  "beforeend",
+  html
+ );
+}
+
+
+function closeComment(){
+
+ let x=document.getElementById(
+  "commentModal"
+ );
+
+ if(x)x.remove();
+}
+
+
+async function sendComment(id){
+
+ let input=document.getElementById(
+  "commentInput"
+ );
+
+ let text=input.value.trim();
+
+ if(!text)return;
+
+ let u=await getUser(USER);
+
+
+ await db.collection("videos")
+  .doc(id)
+  .collection("comments")
+  .add({
+
+   username:"shortzone",
+   displayName:"Short Zone",
+   photo:u.photo||"",
+   text:text,
+   likes:[],
+   createdAt:
+    firebase.firestore.FieldValue
+    .serverTimestamp()
+
+  });
+
+
+ let ref=db.collection("videos").doc(id);
+
+ let s=await ref.get();
+
+ await ref.update({
+
+  commentCount:
+   (s.data().commentCount||0)+1
+
+ });
+
+
+ closeComment();
+
+ loadFeed();
+}
+
+
+async function likeComment(
+ videoId,
+ commentId
+){
+
+ let ref=db.collection("videos")
+  .doc(videoId)
+  .collection("comments")
+  .doc(commentId);
+
+ let s=await ref.get();
+
+ if(!s.exists)return;
+
+ let likes=s.data().likes||[];
+ let pos=-1;
+
+ for(let i=0;i<likes.length;i++){
+
+  if(likes[i]===USER){
+   pos=i;
+   break;
+  }
+
+ }
+
+ if(pos>=0)
+  likes.splice(pos,1);
+ else
+  likes.push(USER);
+
+ await ref.update({
+  likes:likes
+ });
+
+ closeComment();
+
+ showComments(videoId);
+}
+
+
+/* =========================
+   FOLLOW
+========================= */
+
+async function toggleFollow(target){
+
+ if(target===USER)return;
+
+ let id=USER+"_"+target;
+
+ let ref=db.collection("follows")
+  .doc(id);
+
+ let s=await ref.get();
+
+ if(s.exists){
+
+  await ref.delete();
+
+ }else{
+
+  await ref.set({
+
+   follower:USER,
+   following:target,
+
+   createdAt:
+    firebase.firestore.FieldValue
+    .serverTimestamp()
+
+  });
+
+ }
+
+ loadProfile(target);
+}
+
+
+/* =========================
+   PENCARIAN
+========================= */
+
+async function searchAll(){
+
+ let q=document.getElementById(
+  "searchInput"
+ ).value.trim().toLowerCase();
+
+ let type=document.getElementById(
+  "searchType"
+ ).value;
+
+ let box=document.getElementById(
+  "searchResults"
+ );
+
+ if(!q){
+
+  box.innerHTML="";
+  return;
+
+ }
+
+ box.innerHTML="Mencari...";
+
+
+ /* CARI USER */
+
+ if(type==="users"){
+
+  let snap=await db.collection(
+   "users"
+  ).get();
+
+  box.innerHTML="";
+
+
+  snap.forEach(d=>{
+
+   let x=d.data();
+
+   let name=
+    (x.displayName||"").toLowerCase();
+
+   let u=
+    (x.username||"").toLowerCase();
+
+
+   if(
+    name.indexOf(q)>=0||
+    u.indexOf(q)>=0
+   ){
+
+    box.innerHTML+=`
+
+     <div class="result">
+
+      ${avatar(x)}
+
+      <div class="resulttext">
+
+       <b>
+        ${esc(x.displayName||x.username)}
+        ${badge(x.username)}
+       </b>
+
+       <span>
+        @${esc(x.username)}
+       </span>
+
+      </div>
+
+      ${
+       x.username!==USER
+
+       ?`<button
+          class="follow"
+          onclick="toggleFollow('${esc(x.username)}')">
+          +
+         </button>`
+
+       :""
+      }
+
+     </div>
+    `;
+   }
+
+  });
+
+
+ /* CARI VIDEO */
+
+ }else{
+
+  let snap=await db.collection(
+   "videos"
+  ).get();
+
+  box.innerHTML="";
+
+
+  snap.forEach(d=>{
+
+   let x=d.data();
+
+   let c=
+    (x.caption||"").toLowerCase();
+
+   let u=
+    (x.username||"").toLowerCase();
+
+
+   if(
+    c.indexOf(q)>=0||
+    u.indexOf(q)>=0
+   ){
+
+    box.innerHTML+=`
+
+     <div style="padding:12px">
+
+      <video
+       src="${esc(x.url)}"
+       controls
+       playsinline
+       preload="metadata"
+       style="
+        width:100%;
+        max-height:500px;
+        object-fit:contain;
+        background:#000">
+      </video>
+
+      <p>
+       <b>
+        @${esc(x.username)}
+        ${badge(x.username)}
+       </b>
+      </p>
+
+      <p>
+       ${esc(x.caption||"")}
+      </p>
+
+      <button
+       class="secondary"
+       onclick="showCo
